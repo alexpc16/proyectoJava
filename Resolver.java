@@ -13,8 +13,9 @@ public class Resolver {
 
         String[] caracteres = expresion.split("(?<=[-+*/^()])|(?=[-+*/^()])");
         imprimir(caracteres);
-
+        int i = 0;
         for (String caracter : caracteres) {
+            
             System.out.println(caracter);
             System.out.println(operandos + "operandos");
             System.out.println(operadores + "operadores");
@@ -23,7 +24,14 @@ public class Resolver {
                 continue;
             } 
             else if(esNumeroDouble(caracter)){
-                operandos.push(Double.parseDouble(caracter));
+                if(operadores.peek() == '!'){
+                    operandos.push(-Double.parseDouble(caracter));
+                    operadores.pop();
+                }
+                else{
+                    operandos.push(Double.parseDouble(caracter));
+
+                }
             }
 
             else if (caracter.equals("(")) {
@@ -32,8 +40,11 @@ public class Resolver {
             } 
             // operadores.peek() es el ultimo operador en la pila 
             // comparamos si el ultimo operadore en la pila tiene mayor prioridad que el operador actual 
-
+            else if(esOperador(caracter) && esOperadorUnario(caracteres, i)){
+                operadores.push('!');
+            }
             else if (esOperador(caracter)) {
+                System.out.println(esOperadorUnario(caracteres, i)+ "unario");
                 System.out.println("operador");
                 System.out.println(!operadores.isEmpty() && prioridad(operadores.peek()) > prioridad(caracter.charAt(0)));
               
@@ -50,6 +61,7 @@ public class Resolver {
                 }
                 operadores.pop();
             }
+            i++;
      
         }
 
@@ -70,7 +82,19 @@ public class Resolver {
         System.out.println();
 
     }
+    public static boolean esOperadorUnario(String[] expresion, int indice){
+        
+        if(indice == 0){
+            return true;
+        }
+        else if(esOperador(expresion[indice-1])|| expresion[indice-1].equals("(")){
+            return true;
+        }
+      
 
+        return false;
+
+    }
     public static boolean esOperador(String cadena) {
         if (cadena.equals("+") || cadena.equals("-") ||
                 cadena.equals("-") || cadena.equals("*") ||
